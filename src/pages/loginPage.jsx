@@ -27,7 +27,7 @@ export default function LoginPage() {
         setIsLoading(true);
         event.preventDefault()
         let usrLogin = await PostApi(apiUrls.loginUser, user)
-        if (Object.hasOwn(usrLogin, "message")) {
+        if (!usrLogin.status) {
             setIsLoading(false)
             toast.error(usrLogin.message)
             return;
@@ -42,8 +42,15 @@ export default function LoginPage() {
 
     // register user function
 
-    function registerUser(data) {
-        console.log(data);
+    async function registerUser(data) {
+
+        let userRegister = await PostApi(apiUrls.registerUser, data)
+
+        if (userRegister?.status) {
+            toast.success(userRegister.message)
+        } else {
+            toast.error(registerUser.message)
+        }
 
     }
 
@@ -106,9 +113,9 @@ export default function LoginPage() {
                                                     type="text"
                                                     className="form-control"
                                                     id="singin-email-2"
-                                                    name="singin-email"
+                                                    name="mobile_number"
                                                     required=""
-                                                    onChange={(e) => { setUser({ ...user, username: e.target.value }) }}
+                                                    onChange={(e) => { setUser({ ...user, mobile_number: e.target.value }) }}
                                                 />
                                             </div>
                                             {/* End .form-group */}
@@ -118,7 +125,7 @@ export default function LoginPage() {
                                                     type="password"
                                                     className="form-control"
                                                     id="singin-password-2"
-                                                    name="singin-password"
+                                                    name="password"
                                                     required=""
                                                     onChange={(e) => { setUser({ ...user, password: e.target.value }) }}
                                                 />
@@ -183,49 +190,31 @@ export default function LoginPage() {
                                         <form onSubmit={handleSubmit(registerUser)}>
                                             <div className="form-group">
                                                 <label htmlFor="firstName">
-                                                    Your First Name *
+                                                    Your Full Name *
                                                 </label>
                                                 <input
                                                     type="text"
                                                     className="form-control"
-                                                    name="firstName"
-                                                    {...register("firstName", {
-                                                        required: "first Name is Required",
-                                                        pattern: /^[A-Za-z]+$/i
+                                                    name="name"
+                                                    {...register("name", {
+                                                        required: "full Name is Required"
                                                     })}
                                                 />
                                                 <p role="alert" className='text-danger'>{errors.firstName?.message}</p>
                                             </div>
                                             <div className="form-group">
                                                 <label htmlFor="lastName">
-                                                    Your Last Name *
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="lastName"
-                                                    {...register("lastName", {
-                                                        required: "lastName is Required",
-                                                        pattern: /^[A-Za-z]+$/i
-                                                    })}
-                                                />
-                                                 <p role="alert" className='text-danger'>{errors.lastName?.message}</p>
-                                            </div>
-                                            <div className="form-group">
-                                                <label htmlFor="age">
-                                                    Your Age *
+                                                    Mobile Number *
                                                 </label>
                                                 <input
                                                     type="number"
                                                     className="form-control"
-                                                    name="age"
-                                                    {...register("age", {
-                                                        required: "age is Required",
-                                                        min: 18,
-                                                        max: 99
+                                                    name="mobile_number"
+                                                    {...register("mobile_number", {
+                                                        required: "mobile_number is Required",
                                                     })}
                                                 />
-                                                 <p role="alert" className='text-danger'>{errors.age?.message}</p>
+                                                <p role="alert" className='text-danger'>{errors.lastName?.message}</p>
                                             </div>
                                             {/* End .form-group */}
                                             <div className="form-group">
@@ -239,14 +228,15 @@ export default function LoginPage() {
                                                         required: "password is required"
                                                     })}
                                                 />
-                                                 <p role="alert" className='text-danger'>{errors.password?.message}</p>
+                                                <p role="alert" className='text-danger'>{errors.password?.message}</p>
                                             </div>
                                             {/* End .form-group */}
                                             <div className="form-footer">
-                                                <button type="submit" className="btn btn-outline-primary-2">
-                                                    <span>SIGN UP</span>
-                                                    <i className="icon-long-arrow-right" />
-                                                </button>
+                                                {isLoading ? <Spinner animation="border" variant="primary" size='lg' className='loader1' />
+                                                    : <button type="submit" className="btn btn-outline-primary-2">
+                                                        <span>SIGN UP</span>
+                                                        <i className="icon-long-arrow-right" />
+                                                    </button>}
                                                 <div className="custom-control custom-checkbox">
                                                     <input
                                                         type="checkbox"
