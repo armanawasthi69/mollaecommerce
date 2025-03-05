@@ -45,7 +45,7 @@ export default function CartPage() {
                                                                 </a>
                                                             </figure>
                                                             <h3 className="product-title">
-                                                                <a href="#">{ele.title}</a>
+                                                                <a href="#">{ele.prod_name}</a>
                                                             </h3>
                                                             {/* End .product-title */}
                                                         </div>

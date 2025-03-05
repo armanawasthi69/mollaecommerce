@@ -72,11 +72,12 @@ export default function ProductCard({ data, cardSize }) {
                         {/* End .product-cat */}
                         <h3 className="product-title">
                             <a href="product.html">
-                                {data.title}
+                                {data.prod_name}
                             </a>
                         </h3>
                         {/* End .product-title */}
-                        <div className="product-price">₹{data.price}</div>
+                        <div className="product-price text-secondary p-0 m-0">₹{data.price}</div>
+                        <del className="text-dark">Discount ₹{data.discount}</del>
                         {/* End .product-price */}
                         <div className="product-nav product-nav-thumbs">
                             {data.images?.map((item, idx) => (

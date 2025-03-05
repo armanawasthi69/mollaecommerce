@@ -23,7 +23,7 @@ export default function ShopPage() {
         let data = await fetchApi(apiUrls.otherProductApi)
         if (data) {
             console.log(data);
-            setProducts(data.products)
+            setProducts(data.data)
         }
 
         let category = await fetchApi(apiUrls.getAllcategoriesList)

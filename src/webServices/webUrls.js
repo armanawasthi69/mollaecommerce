@@ -1,7 +1,7 @@
 // Desc: This file contains all the api urls that are used in the application.
 export const apiUrls = {
-    ProductApi: "https://api.escuelajs.co/api/v1/products",
-    otherProductApi: "https://dummyjson.com/products",
+    ProductApi: "http://localhost:9000/products",
+    otherProductApi: "http://localhost:9000/products",
     getAllCategories: "https://dummyjson.com/products/categories",
     getAllcategoriesList: 'https://dummyjson.com/products/category-list',
     getProductByCategory: "https://dummyjson.com/products/category", // category name
