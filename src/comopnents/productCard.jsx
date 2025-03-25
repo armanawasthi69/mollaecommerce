@@ -32,7 +32,7 @@ export default function ProductCard({ data, cardSize }) {
             <div className={`col-6 ${cardSize ? cardSize : "col-md-4 col-lg-4"}`}>
                 <div className="product product-7 text-center">
                     <figure className="product-media">
-                        <Link to={`/product/${data.id}`} className="product-image">
+                        <Link to={`/product/${data._id}`} className="product-image">
                             <img
                                 src={data?.thumbnail}
                                 alt="Product image"

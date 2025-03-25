@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Banner from '../comopnents/banner'
 import { useDispatch, useSelector } from 'react-redux'
-import { addToCartApi, Decrement, DeleteToCart, Increment } from '../redux/slice/cartslice'
+import { addToCartApi, DeleteToCart, updateCart } from '../redux/slice/cartslice'
 import axiosClient from '../webServices/getWay'
 import { apiUrls } from '../webServices/webUrls'
 import { toast } from 'react-toastify'
@@ -10,12 +10,37 @@ import { toast } from 'react-toastify'
 export default function CartPage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const qRef = useRef()
     const Carts = useSelector((store) => store.cart.value)
-    const totalPrice = Carts.reduce((curr, ele) => curr + ele.price * ele.quantity, 0)
+    const totalPrice = Carts.reduce((curr, ele) => curr + ele.total_price, 0)
 
     function removeItem(id) {
         dispatch(DeleteToCart(id))
     }
+
+    const update = useCallback(async (cart, btn) => {
+        let quant = parseInt(qRef.current.value)
+        
+        if (btn) {
+            quant += 1
+        } else {
+            quant -= 1
+        }
+
+        try {
+            let res = await axiosClient.put(`${apiUrls.updateCart}/${cart._id}/${cart.product._id}`, { quantity: quant }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if (res.data.status) {
+                dispatch(updateCart(res.data.data))
+                toast.success("added To cart")
+            }
+        } catch (error) {
+            toast.error(error.response.data.message)
+        }
+    }, [qRef])
 
     useEffect(() => {
         (async () => {
@@ -75,19 +100,20 @@ export default function CartPage() {
                                                     <td className="price-col">₹{ele.product.price}</td>
                                                     <td className="quantity-col">
                                                         <div className="cart-product-quantity d-flex justify-content-center" style={{ gap: "5px" }}>
-                                                            <button onClick={() => { dispatch(Decrement(ele.id)) }} className='border-0'>-</button>
+                                                            <button className='border-0' value={0} onClick={(e) => { update(ele, e.target.value) }}>-</button>
                                                             <input
                                                                 type="text"
                                                                 className="form-control p-2"
                                                                 value={ele.quantity}
+                                                                ref={qRef}
                                                             />
-                                                            <button onClick={() => { dispatch(Increment(ele.id)) }} className='border-0'>+</button>
+                                                            <button className='border-0' value={1} onClick={(e) => { update(ele, e.target.value) }}>+</button>
                                                         </div>
                                                         {/* End .cart-product-quantity */}
                                                     </td>
-                                                    <td className="total-col">₹{ele.product.price * ele.quantity}</td>
+                                                    <td className="total-col">₹{ele.total_price}</td>
                                                     <td className="remove-col">
-                                                        <button className="btn-remove" onClick={() => { removeItem(ele.id) }}>
+                                                        <button className="btn-remove" onClick={() => { removeItem(ele._id) }}>
                                                             <i className="icon-close" />
                                                         </button>
                                                     </td>

@@ -5,4 +5,6 @@ export const apiUrls = {
     registerUser: '/users/adduser',
     addToCartApi: '/v1/cart/add',
     getAllCartApi: '/v1/cart',
+    singleProduct :"/products/", // id
+    updateCart : "/v1/cart/quantity" //  :cartId/:productId"
 }

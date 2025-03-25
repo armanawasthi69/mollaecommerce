@@ -8,7 +8,10 @@ const cartSlice = createSlice({
     },
     reducers: {
         addToCart: (state, action) => {
-            state.value.push(action.payload)
+            let indx = state.value.findIndex((ele) => ele._id === action.payload._id)
+            if (indx !== -1) {
+                state.value.push(action.payload)
+            }
         },
 
         addToCartApi: (state, action) => {
@@ -16,29 +19,18 @@ const cartSlice = createSlice({
         },
 
         DeleteToCart: (state, action) => {
-            let indx = state.value.findIndex((ele) => ele.id === action.payload)
+            let indx = state.value.findIndex((ele) => ele._id === action.payload)
             state.value.splice(indx, 1)
             toast.error("Deleted")
         },
 
-        Increment: (state, action) => {
-            let id = action.payload
-            let indx = state.value.findIndex((ele) => ele.id === id)
-            if (state.value[indx].quantity < 10) {
-                state.value[indx].quantity += 1
-            }
+        updateCart: (state, action) => {
+            let indx = state.value.findIndex((ele) => ele._id === action.payload._id)
+            state.value.splice(indx, 1, action.payload)
         },
-
-        Decrement: (state, action) => {
-            let id = action.payload
-            let indx = state.value.findIndex((ele) => ele.id === id)
-            if (state.value[indx].quantity > 1) {
-                state.value[indx].quantity -= 1
-            }
-        }
     }
 
 })
 
-export const { addToCart, DeleteToCart, Increment, Decrement,addToCartApi } = cartSlice.actions;
+export const { addToCart, DeleteToCart, updateCart, addToCartApi } = cartSlice.actions;
 export default cartSlice.reducer;

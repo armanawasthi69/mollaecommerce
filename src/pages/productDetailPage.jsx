@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { baseUrl } from '../utils/helper'
-import axiosClient, { axiosApi } from '../webServices/getWay'
+import axiosClient from '../webServices/getWay'
 import { apiUrls } from '../webServices/webUrls'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,16 +13,25 @@ export default function ProductDetail() {
     const Carts = useSelector((store) => store.cart.value)
     const [productDetail, setProductDetail] = useState({})
 
-    function addCart() {
-        productDetail.quantity = 1
-        dispatch(addToCart(productDetail))
-        toast.success("add to cart")
+    async function addCart() {
+        try {
+            let res = await axiosClient.post(apiUrls.addToCartApi, { product: productDetail._id }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if (res.data.status) {
+                dispatch(addToCart(res.data.data))
+                toast.success("added To cart")
+            }
+        } catch (error) {
+            toast.error(error.response.data.message)
+        }
     }
 
     const fetchProductDetail = useCallback(async () => {
         const response = await axiosClient.get(apiUrls.singleProduct + id)
-        console.log(response);
-        setProductDetail(response)
+        setProductDetail(response.data.data)
     }, [id])
 
     useEffect(() => {
@@ -80,8 +88,8 @@ export default function ProductDetail() {
                                         <figure className="product-main-image">
                                             <img
                                                 id="product-zoom"
-                                                src={productDetail.thumbnail}
-                                                data-zoom-image={`${baseUrl()}/assets/images/products/single/extended/3-big.jpg`}
+                                                src={productDetail?.thumbnail}
+                                                data-zoom-image={productDetail?.thumbnail}
                                                 alt="product image"
                                             />
                                             <a
@@ -97,7 +105,7 @@ export default function ProductDetail() {
                                             id="product-zoom-gallery"
                                             className="product-image-gallery"
                                         >
-                                            {productDetail.images?.map((ele, indx) => (
+                                            {productDetail?.images?.map((ele, indx) => (
                                                 <a
                                                     className="product-gallery-item"
                                                     href="#"
@@ -120,7 +128,7 @@ export default function ProductDetail() {
                                 <div className="col-md-6">
                                     <div className="product-details">
                                         <h1 className="product-title">
-                                            {productDetail.title}
+                                            {productDetail?.prod_name}
                                         </h1>
                                         {/* End .product-title */}
                                         <div className="ratings-container">
@@ -138,11 +146,11 @@ export default function ProductDetail() {
                                             </a>
                                         </div>
                                         {/* End .rating-container */}
-                                        <div className="product-price">₹{productDetail.price}</div>
+                                        <div className="product-price">₹{productDetail?.price}</div>
                                         {/* End .product-price */}
                                         <div className="product-content">
                                             <p>
-                                                {productDetail.description}
+                                                {productDetail?.discription}
                                             </p>
                                         </div>
                                         {/* End .product-content */}
@@ -208,8 +216,8 @@ export default function ProductDetail() {
                                         </div>
                                         {/* End .details-filter-row */}
                                         <div className="product-details-action">
-                                            {Carts && Carts.filter((ele) => ele.id === productDetail.id).length ?
-                                                <button onClick={()=>{navigate("/cart")}} className="btn-product btn-cart">
+                                            {Carts && Carts.filter((ele) => ele._id === productDetail._id).length ?
+                                                <button onClick={() => { navigate("/cart") }} className="btn-product btn-cart">
                                                     <span>View In Cart</span>
                                                 </button> :
                                                 <button onClick={addCart} className="btn-product btn-cart">
@@ -239,9 +247,7 @@ export default function ProductDetail() {
                                         <div className="product-details-footer">
                                             <div className="product-cat">
                                                 <span>Category:</span>
-                                                {productDetail.tags?.map((ele, indx) => (
-                                                    <a href="#" key={indx}>{ele},</a>
-                                                ))}
+                                                <a href="#">{productDetail.category}</a>
                                             </div>
                                             {/* End .product-cat */}
                                             <div className="social-icons social-icons-sm">
