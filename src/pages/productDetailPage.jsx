@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { baseUrl } from '../utils/helper'
-import { axiosApi } from '../webServices/getWay'
+import axiosClient, { axiosApi } from '../webServices/getWay'
 import { apiUrls } from '../webServices/webUrls'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,7 +21,7 @@ export default function ProductDetail() {
     }
 
     const fetchProductDetail = useCallback(async () => {
-        const response = await axiosApi(apiUrls.singleProduct + id)
+        const response = await axiosClient.get(apiUrls.singleProduct + id)
         console.log(response);
         setProductDetail(response)
     }, [id])

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Banner from '../comopnents/banner'
 import { Link, useParams } from 'react-router-dom'
 import { apiUrls } from '../webServices/webUrls'
-import {fetchApi} from '../webServices/getWay';
+import axiosClient, {fetchApi} from '../webServices/getWay';
 import ProductCard from '../comopnents/productCard';
 import { PageCount } from '../utils/helper';
 import { Spinner } from 'react-bootstrap';
@@ -19,7 +19,7 @@ export default function CategoryPage() {
 
     // data facting from api function
     async function fetchData() {
-        let data = await fetchApi(`${apiUrls.getProductByCategory}/${slug}`)
+        let data = await axiosClient.get(`${apiUrls.getProductByCategory}/${slug}`)
         if (data) {
             console.log(data);
             setProducts(data.products)

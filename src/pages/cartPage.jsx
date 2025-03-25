@@ -1,17 +1,38 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Banner from '../comopnents/banner'
 import { useDispatch, useSelector } from 'react-redux'
-import { Decrement, DeleteToCart, Increment } from '../redux/slice/cartslice'
+import { addToCartApi, Decrement, DeleteToCart, Increment } from '../redux/slice/cartslice'
+import axiosClient from '../webServices/getWay'
+import { apiUrls } from '../webServices/webUrls'
+import { toast } from 'react-toastify'
 
 export default function CartPage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const Carts = useSelector((store) => store.cart.value)
-    const totalPrice = Carts.reduce((curr,ele)=>curr+ele.price*ele.quantity,0)
+    const totalPrice = Carts.reduce((curr, ele) => curr + ele.price * ele.quantity, 0)
+
     function removeItem(id) {
         dispatch(DeleteToCart(id))
     }
+
+    useEffect(() => {
+        (async () => {
+            try {
+                let res = await axiosClient.get(apiUrls.getAllCartApi, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+                if (res.data.status) {
+                    dispatch(addToCartApi(res.data.data))
+                }
+            } catch (error) {
+                toast.error(error.response.data.message)
+            }
+        })()
+    }, [])
 
     return (
         <>
@@ -39,19 +60,19 @@ export default function CartPage() {
                                                             <figure className="product-media">
                                                                 <a href="#">
                                                                     <img
-                                                                        src={ele.thumbnail}
+                                                                        src={ele.product.thumbnail}
                                                                         alt="Product image"
                                                                     />
                                                                 </a>
                                                             </figure>
                                                             <h3 className="product-title">
-                                                                <a href="#">{ele.prod_name}</a>
+                                                                <a href="#">{ele.product.prod_name}</a>
                                                             </h3>
                                                             {/* End .product-title */}
                                                         </div>
                                                         {/* End .product */}
                                                     </td>
-                                                    <td className="price-col">₹{ele.price}</td>
+                                                    <td className="price-col">₹{ele.product.price}</td>
                                                     <td className="quantity-col">
                                                         <div className="cart-product-quantity d-flex justify-content-center" style={{ gap: "5px" }}>
                                                             <button onClick={() => { dispatch(Decrement(ele.id)) }} className='border-0'>-</button>
@@ -64,7 +85,7 @@ export default function CartPage() {
                                                         </div>
                                                         {/* End .cart-product-quantity */}
                                                     </td>
-                                                    <td className="total-col">₹{ele.price*ele.quantity}</td>
+                                                    <td className="total-col">₹{ele.product.price * ele.quantity}</td>
                                                     <td className="remove-col">
                                                         <button className="btn-remove" onClick={() => { removeItem(ele.id) }}>
                                                             <i className="icon-close" />
@@ -210,7 +231,7 @@ export default function CartPage() {
                                     </div>
                                     {/* End .summary */}
                                     <button
-                                        onClick={()=>{navigate(-2)}}
+                                        onClick={() => { navigate(-2) }}
                                         className="btn btn-outline-dark-2 btn-block mb-3"
                                     >
                                         <span>CONTINUE SHOPPING</span>

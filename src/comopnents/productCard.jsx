@@ -3,16 +3,28 @@ import { addToCart } from '../redux/slice/cartslice'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import axiosClient from '../webServices/getWay'
+import { apiUrls } from '../webServices/webUrls'
 
 export default function ProductCard({ data, cardSize }) {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const carts = useSelector((store) => store.cart.value)
     // add to card function
-    function SaveToCart(product) {
-        product.quantity = 1
-        dispatch(addToCart(product))
-        toast.success("added To cart")
+    async function SaveToCart(id) {
+        try {
+            let res = await axiosClient.post(apiUrls.addToCartApi, { product: id }, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            if (res.data.status) {
+                dispatch(addToCart(res.data.data))
+                toast.success("added To cart")
+            }
+        } catch (error) {
+            toast.error(error.response.data.message)
+        }
     }
 
     return (
@@ -53,11 +65,11 @@ export default function ProductCard({ data, cardSize }) {
                         </div>
                         {/* End .product-action-vertical */}
                         <div className="product-action">
-                            {carts && carts.filter((ele) => ele.id === data.id).length ?
+                            {carts && carts.filter((ele) => ele?.products?._id === data._id)?.length ?
                                 <button onClick={() => { navigate("/cart") }} className="btn-product btn-cart border-0">
                                     <span>already in cart</span>
                                 </button> :
-                                <button onClick={() => { SaveToCart(data) }} className="btn-product btn-cart border-0">
+                                <button onClick={() => { SaveToCart(data._id) }} className="btn-product btn-cart border-0">
                                     <span>add to cart</span>
                                 </button>
                             }

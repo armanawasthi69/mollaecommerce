@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Banner from '../comopnents/banner'
 import { Link } from 'react-router-dom'
 import { apiUrls } from '../webServices/webUrls'
-import {fetchApi, PostApi} from '../webServices/getWay';
+import { fetchApi, PostApi } from '../webServices/getWay';
 import ProductCard from '../comopnents/productCard';
 import { PageCount } from '../utils/helper';
 import { Spinner } from 'react-bootstrap';
 
-export default function ShopPage() {
+export default function ShopPage({ products }) {
     let user = JSON.parse(localStorage.getItem("user"))
     const [cardSize, setCardSize] = useState("col-md-4 col-lg-4");
-    const [products, setProducts] = useState([]);
     const [filterProd, setFilterProd] = useState([]);
     const [allCategories, setAllCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState([]);
@@ -18,21 +17,7 @@ export default function ShopPage() {
     const [pageNumber, setPageNumber] = useState(1)
     const pagination = PageCount((filterProd.length ? filterProd : products)?.length, perPageItem)
 
-    // data facting from api function
-    async function fetchData() {
-        let data = await fetchApi(apiUrls.otherProductApi)
-        if (data) {
-            console.log(data);
-            setProducts(data.data)
-        }
 
-        let category = await fetchApi(apiUrls.getAllcategoriesList)
-        if (category) {
-            console.log(category);
-            setAllCategories(category)
-        }
-
-    }
 
     //for filter products function
     function filterProduct(e) {
@@ -68,10 +53,6 @@ export default function ShopPage() {
     }
 
 
-    // for api calling function call
-    useEffect(() => {
-        fetchData()
-    }, [])
 
 
     // for every click render filter proccess

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Breadcrum from '../comopnents/breadcrum'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { PostApi } from '../webServices/getWay'
+import axiosClient, { PostApi } from '../webServices/getWay'
 import { apiUrls } from '../webServices/webUrls'
 import { Spinner } from 'react-bootstrap'
 import { toast } from 'react-toastify';
@@ -26,13 +26,14 @@ export default function LoginPage() {
     async function LoginUser(event) {
         setIsLoading(true);
         event.preventDefault()
-        let usrLogin = await PostApi(apiUrls.loginUser, user)
-        if (!usrLogin.status) {
+        let res = await axiosClient.post(apiUrls.loginUser, user)
+        if (!res.data.status) {
             setIsLoading(false)
-            toast.error(usrLogin.message)
+            toast.error(res.data.message)
             return;
         }
-        localStorage.setItem("user", JSON.stringify(usrLogin))
+        localStorage.setItem("token", res.data.data.token)
+        localStorage.setItem("user", JSON.stringify(res.data.data))
         setIsLoading(false)
         toast.success("user Login suceess")
         navigate(-1)
@@ -44,7 +45,7 @@ export default function LoginPage() {
 
     async function registerUser(data) {
 
-        let userRegister = await PostApi(apiUrls.registerUser, data)
+        let userRegister = await axiosClient.post(apiUrls.registerUser, data)
 
         if (userRegister?.status) {
             toast.success(userRegister.message)

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { fetchApi } from '../webServices/getWay'
-import { apiUrls } from '../webServices/webUrls'
 import { useSelector } from 'react-redux'
 
 export default function Header() {
@@ -11,18 +9,6 @@ export default function Header() {
     const [categories, setCategories] = useState([]);
     const [loginData, setLoginData] = useState(false)
 
-
-    // get all categories from api function
-    async function getCate() {
-        let data = await fetchApi(apiUrls.getAllCategories)
-        if (data) {
-            setCategories(data)
-        }
-    }
-
-    useEffect(() => {
-        getCate()
-    }, [])
 
 
     useEffect(() => {
@@ -418,18 +404,18 @@ export default function Header() {
                                                 <div className="product-cart-details">
                                                     <h4 className="product-title">
                                                         <Link to="product.html">
-                                                            {ele.title}
+                                                            {ele.product.prod_name}
                                                         </Link>
                                                     </h4>
                                                     <span className="cart-product-info">
-                                                        <span className="cart-product-qty">1</span>x ${ele.price}
+                                                        <span className="cart-product-qty">1</span>x ${ele.product.price}
                                                     </span>
                                                 </div>
                                                 {/* End .product-cart-details */}
                                                 <figure className="product-image-container">
                                                     <Link to="product.html" className="product-image">
                                                         <img
-                                                            src={ele.thumbnail}
+                                                            src={ele.product.thumbnail}
                                                             alt="product"
                                                         />
                                                     </Link>

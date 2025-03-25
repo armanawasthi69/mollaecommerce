@@ -13,18 +13,41 @@ import WishListPage from './pages/wishListPage';
 import AccountPage from './pages/myAccountPage';
 import NotFoundPage from './pages/404Page';
 import LoginPage from './pages/loginPage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BackToTop } from './utils/helper';
 import CategoryPage from './pages/categorywisePage';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import Private from './routes/private';
+import axiosClient from './webServices/getWay';
+import { apiUrls } from './webServices/webUrls';
 
 function App() {
   let { pathname } = useLocation()
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     BackToTop()
   }, [pathname])
+
+  // data facting from api function
+  async function fetchData() {
+    try {
+      let res = await axiosClient.get(apiUrls.ProductApi)
+      if (res.data.status) {
+        setProducts(res.data.data)
+      }
+    } catch (error) {
+      toast.error(error.res.data.message)
+    }
+
+
+  }
+
+
+  // for api calling function call
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
     <>
@@ -33,8 +56,8 @@ function App() {
 
         <Routes>
 
-          <Route path='/' element={<HomePage />} />
-          <Route path='/shop' element={<ShopPage />} />
+          <Route path='/' element={<HomePage products={products}/>} />
+          <Route path='/shop' element={<ShopPage products={products}/>} />
           <Route path='/product/:id' element={<ProductDetail />} />
           <Route path='/about' element={<AboutPage />} />
           <Route path='/:slug' element={<CategoryPage />} />
