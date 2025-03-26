@@ -10,7 +10,6 @@ import { toast } from 'react-toastify'
 export default function CartPage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const qRef = useRef()
     const Carts = useSelector((store) => store.cart.value)
     const totalPrice = Carts.reduce((curr, ele) => curr + ele.total_price, 0)
 
@@ -19,9 +18,10 @@ export default function CartPage() {
     }
 
     const update = useCallback(async (cart, btn) => {
-        let quant = parseInt(qRef.current.value)
-        
-        if (btn) {
+
+        let quant = cart.quantity
+
+        if (parseInt(btn)) {
             quant += 1
         } else {
             quant -= 1
@@ -35,12 +35,13 @@ export default function CartPage() {
             })
             if (res.data.status) {
                 dispatch(updateCart(res.data.data))
-                toast.success("added To cart")
+            }else{
+                toast.error(res.data.message)
             }
         } catch (error) {
             toast.error(error.response.data.message)
         }
-    }, [qRef])
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -100,12 +101,11 @@ export default function CartPage() {
                                                     <td className="price-col">₹{ele.product.price}</td>
                                                     <td className="quantity-col">
                                                         <div className="cart-product-quantity d-flex justify-content-center" style={{ gap: "5px" }}>
-                                                            <button className='border-0' value={0} onClick={(e) => { update(ele, e.target.value) }}>-</button>
+                                                            <button className='border-0' disabled={ele.quantity<2?true:false} value={0} onClick={(e) => { update(ele, e.target.value) }}>-</button>
                                                             <input
                                                                 type="text"
                                                                 className="form-control p-2"
                                                                 value={ele.quantity}
-                                                                ref={qRef}
                                                             />
                                                             <button className='border-0' value={1} onClick={(e) => { update(ele, e.target.value) }}>+</button>
                                                         </div>

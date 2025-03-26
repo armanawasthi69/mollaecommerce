@@ -4,8 +4,10 @@ import {
   useElements
 } from "@stripe/react-stripe-js";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const CheckoutForm = () => {
+const CheckoutForm = ({ totalPrice, cartData }) => {
+
 
   const stripe = useStripe();
   const elements = useElements();
@@ -28,9 +30,9 @@ const CheckoutForm = () => {
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/complete",
+        return_url: "http://localhost:3000/checkout",
       },
-      redirect:"always"
+      redirect: "always"
     });
 
     // This point will only be reached if there is an immediate error when
@@ -126,23 +128,22 @@ const CheckoutForm = () => {
               <thead>
                 <tr>
                   <th>Product</th>
+                  <th>Quantity</th>
                   <th>Total</th>
                 </tr>
               </thead>
 
               <tbody>
-                <tr>
-                  <td><a href="#">Beige knitted elastic runner shoes</a></td>
-                  <td>$84.00</td>
-                </tr>
-
-                <tr>
-                  <td><a href="#">Blue utility pinafore denimdress</a></td>
-                  <td>$76,00</td>
-                </tr>
+                {cartData && cartData.map((ele, indx) => (
+                  <tr key={indx}>
+                    <td><Link to={``}>{ele.product.prod_name}</Link></td>
+                    <td>{ele.quantity}</td>
+                    <td>₹{ele.total_price}</td>
+                  </tr>
+                ))}
                 <tr className="summary-subtotal">
                   <td>Subtotal:</td>
-                  <td>$160.00</td>
+                  <td>₹{totalPrice}</td>
                 </tr>
                 <tr>
                   <td>Shipping:</td>
@@ -150,7 +151,7 @@ const CheckoutForm = () => {
                 </tr>
                 <tr className="summary-total">
                   <td>Total:</td>
-                  <td>$160.00</td>
+                  <td>₹{totalPrice}</td>
                 </tr>
               </tbody>
             </table>

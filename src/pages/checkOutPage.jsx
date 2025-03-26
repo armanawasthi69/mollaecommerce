@@ -4,10 +4,15 @@ import CheckoutForm from '../comopnents/checkoutForm';
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import stripe from "stripe";
+import { useSelector } from 'react-redux';
 
 const stripePromise = loadStripe("pk_test_51Qff5rSCkjXRURrpSeuQrqFUxXBFKwxtmwZyF0TCfjikiMNZre1wBgEXdtdQZoFmfCO1GWeNWyupr0z87kLYsKze00JeaAePbI");
 
 export default function CheckOutPage() {
+
+    const Carts = useSelector((store) => store.cart.value)
+  const [cartData, setCartData] = useState(Carts)
+  const totalPrice = cartData.reduce((curr, ele) => curr + ele.total_price, 0)
 
     const [clientSecret, setClientSecret] = useState("");
     const strp = stripe('sk_test_51Qff5rSCkjXRURrpD0WCUngMWDzqiZf0MogOK62AooxpQcingM3DKkF05KRtpTjqmXnZnhiQYfcfha6Wz6DKjEDI00zSrVlx2m')
@@ -28,7 +33,7 @@ export default function CheckOutPage() {
                             country: 'US',
                         },
                     },
-                    amount: 1099,
+                    amount: totalPrice,
                     currency: 'usd',
                     payment_method_types: ['card'],
                 });
@@ -39,7 +44,7 @@ export default function CheckOutPage() {
                 console.log(error);
             }
         })()
-    }, []);
+    }, [strp.paymentIntents]);
 
     const appearance = {
         theme: 'stripe',
@@ -73,7 +78,7 @@ export default function CheckOutPage() {
                             {/* End .checkout-discount */}
                             {clientSecret && (
                                 <Elements options={{ clientSecret, appearance, loader }} stripe={stripePromise}>
-                                    <CheckoutForm />
+                                    <CheckoutForm cartData={cartData} totalPrice={totalPrice}/>
                                 </Elements>
                             )}
                         </div>
